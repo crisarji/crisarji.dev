@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Not found" description="That page doesn't exist.">
+  <section class="wrap page">
+    <p class="eyebrow">404</p>
+    <h1>That page doesn't exist.</h1>
+    <p class="prose">
+      Either it moved, or the link was wrong. The work is all
+      <a href="/work">on one page</a>, which is the safest place to start.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: clamp(4rem, 12vw, 8rem);
+    text-align: center;
+  }
+  .prose { margin-inline: auto; margin-top: 1.25rem; }
+</style>

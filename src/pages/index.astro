@@ -1,0 +1,104 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+
+const featured = (await getCollection("projects", ({ data }) => data.featured))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<BaseLayout
+  title="Cris Arji"
+  description="Engineer. Case studies on the systems I've built, the constraints I built them under, and the decisions behind them."
+>
+  <section class="hero wrap">
+    <p class="eyebrow">Engineer</p>
+    <h1>I build systems and write down why they are shaped that way.</h1>
+    <p class="lede">
+      Every project here comes with the constraints it was built under and the
+      alternatives I turned down. That's the part a résumé bullet leaves out.
+    </p>
+    <p class="cta">
+      <a href="/work">See the work</a>
+      <a class="secondary" href="/about">More about me</a>
+    </p>
+  </section>
+
+  <section class="wrap">
+    <div class="head">
+      <h2>Selected work</h2>
+      <a href="/work">All projects</a>
+    </div>
+
+    {
+      featured.length > 0 ? (
+        <div class="grid">
+          {featured.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty">
+          No featured projects yet. Set <code>featured: true</code> on a file in{" "}
+          <code>src/content/projects/</code>.
+        </p>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: clamp(3rem, 8vw, 6rem) clamp(2rem, 5vw, 3.5rem);
+  }
+  .hero h1 { max-width: 20ch; margin-top: 0.75rem; }
+
+  .lede {
+    max-width: var(--measure);
+    margin-top: 1.25rem;
+    font-size: var(--t-lg);
+    color: var(--body);
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    font-weight: 500;
+  }
+  .cta a { text-decoration: none; }
+  .cta a:hover { text-decoration: underline; }
+  .secondary { color: var(--muted); }
+
+  section + section {
+    padding-bottom: clamp(3rem, 8vw, 5rem);
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: var(--gap);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .head a { font-size: var(--t-sm); text-decoration: none; }
+  .head a:hover { text-decoration: underline; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: var(--gap);
+  }
+
+  .empty {
+    color: var(--muted);
+    font-size: var(--t-sm);
+    padding: 2rem;
+    border: 1px dashed var(--rule);
+    border-radius: var(--radius);
+  }
+</style>

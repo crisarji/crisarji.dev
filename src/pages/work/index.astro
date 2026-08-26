@@ -1,0 +1,41 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+
+// Phase 2 adds the technology filter on top of this list.
+const projects = (await getCollection("projects")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<BaseLayout
+  title="Work"
+  description="Case studies: the problem, the constraints, the architecture, and the decisions behind each build."
+>
+  <section class="wrap page">
+    <p class="eyebrow">Work</p>
+    <h1>Case studies</h1>
+    <p class="prose lede">
+      Each one follows the same six parts: the problem, the constraints, the
+      architecture, the decisions, what I'd change, and the outcome.
+    </p>
+
+    <div class="grid">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page { padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(3rem, 8vw, 5rem); }
+  h1 { margin-top: 0.5rem; }
+  .lede { margin-top: 1rem; font-size: var(--t-lg); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: var(--gap);
+    margin-top: 2.5rem;
+  }
+</style>

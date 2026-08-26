@@ -1,0 +1,98 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const { title, blurb, role, period, stack, liveUrl, confidential } = project.data;
+---
+
+<article>
+  <a class="lift" href={`/work/${project.id}`}>
+    <h3>{title}</h3>
+  </a>
+
+  <p class="meta">
+    <span>{role}</span>
+    <span aria-hidden="true">·</span>
+    <span>{period}</span>
+  </p>
+
+  <p class="blurb">{blurb}</p>
+
+  <ul class="stack">
+    {stack.map((tech) => <li>{tech}</li>)}
+  </ul>
+
+  <p class="actions">
+    <a href={`/work/${project.id}`}>Read the case study</a>
+    {
+      liveUrl && !confidential && (
+        <a class="secondary" href={liveUrl} target="_blank" rel="noopener">
+          Visit the site <span aria-hidden="true">↗</span>
+        </a>
+      )
+    }
+  </p>
+</article>
+
+<style>
+  article {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  /* The title is the big click target; the whole card is not a link, so the
+     secondary "Visit the site" link stays reachable. */
+  .lift { text-decoration: none; }
+  .lift h3 { color: var(--ink); }
+  .lift:hover h3 { color: var(--accent); }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    color: var(--muted);
+  }
+
+  .blurb { font-size: var(--t-sm); }
+
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+    margin-top: 0.25rem;
+  }
+  .stack li {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    color: var(--muted);
+    background: var(--sunk);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    font-size: var(--t-sm);
+  }
+  .actions a { text-decoration: none; font-weight: 500; }
+  .actions a:hover { text-decoration: underline; }
+  .secondary { color: var(--muted); }
+</style>

@@ -1,0 +1,155 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const { title, blurb, role, period, stack, liveUrl, repoUrl, confidential } =
+  project.data;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={title} description={blurb}>
+  <article class="wrap page">
+    <header>
+      <p class="eyebrow">Case study</p>
+      <h1>{title}</h1>
+      <p class="lede">{blurb}</p>
+
+      <dl class="facts">
+        <div><dt>Role</dt><dd>{role}</dd></div>
+        <div><dt>Period</dt><dd>{period}</dd></div>
+        <div><dt>Stack</dt><dd>{stack.join(", ")}</dd></div>
+      </dl>
+
+      {
+        (liveUrl || repoUrl) && !confidential && (
+          <p class="links">
+            {liveUrl && (
+              <a href={liveUrl} target="_blank" rel="noopener">
+                Visit the site <span aria-hidden="true">↗</span>
+              </a>
+            )}
+            {repoUrl && (
+              <a href={repoUrl} target="_blank" rel="noopener">
+                Source <span aria-hidden="true">↗</span>
+              </a>
+            )}
+          </p>
+        )
+      }
+
+      {
+        confidential && (
+          <p class="note">
+            The client system is private. This is a reconstruction of the parts
+            I designed, not the shipped product.
+          </p>
+        )
+      }
+    </header>
+
+    <div class="body prose">
+      <Content />
+    </div>
+
+    <footer>
+      <a href="/work">← All case studies</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .page { padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(3rem, 8vw, 5rem); }
+  h1 { margin-top: 0.5rem; }
+
+  .lede {
+    max-width: var(--measure);
+    margin-top: 1rem;
+    font-size: var(--t-lg);
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin-top: 2rem;
+    padding-block: 1.25rem;
+    border-block: 1px solid var(--rule-soft);
+  }
+  dt {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  dd { margin: 0.15rem 0 0; font-size: var(--t-sm); color: var(--ink); }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+    font-size: var(--t-sm);
+    font-weight: 500;
+  }
+  .links a { text-decoration: none; }
+  .links a:hover { text-decoration: underline; }
+
+  .note {
+    max-width: var(--measure);
+    margin-top: 1.5rem;
+    padding: 0.9rem 1.1rem;
+    font-size: var(--t-sm);
+    color: var(--body);
+    background: var(--clay-q);
+    border-left: 2px solid var(--clay);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .body { margin-top: 3rem; }
+  .body :global(h2) {
+    margin-top: 2.75rem;
+    margin-bottom: 0.75rem;
+    font-size: var(--t-xl);
+  }
+  .body :global(h3) { margin-top: 2rem; margin-bottom: 0.5rem; }
+  .body :global(p + p) { margin-top: 1rem; }
+  .body :global(ul), .body :global(ol) { padding-left: 1.25rem; }
+  .body :global(li + li) { margin-top: 0.35rem; }
+  .body :global(img) { border-radius: var(--radius); margin-block: 1.5rem; }
+  .body :global(blockquote) {
+    margin-block: 1.5rem;
+    padding-left: 1.1rem;
+    border-left: 2px solid var(--accent);
+    color: var(--muted);
+  }
+  .body :global(pre) {
+    margin-block: 1.5rem;
+    padding: 1rem 1.1rem;
+    background: var(--sunk);
+    border-radius: var(--radius);
+    overflow-x: auto;
+  }
+
+  footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule-soft);
+    font-size: var(--t-sm);
+  }
+  footer a { text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>

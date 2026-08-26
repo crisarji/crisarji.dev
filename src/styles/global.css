@@ -1,0 +1,150 @@
+/* ---------------------------------------------------------------------------
+   Design tokens. Palette carried over from the build-plan document so the site
+   and its plan share an identity. Light values live on :root; dark mode only
+   redefines the tokens, never the rules that consume them.
+--------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --ground:    #F1F3EF;
+  --surface:   #FAFBF8;
+  --sunk:      #E8EBE5;
+  --ink:       #151B19;
+  --body:      #2C3532;
+  --muted:     #5D6763;
+  --rule:      #D8DDD4;
+  --rule-soft: #E4E8E0;
+  --accent:    #0C6C61;
+  --accent-q:  #0C6C6118;
+  --clay:      #96543A;
+  --clay-q:    #96543A14;
+  --shadow:    0 1px 2px rgba(21, 27, 25, .05);
+
+  --f-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --f-body:    "Karla", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:    ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Fluid type: min at 360px, max at 1200px. */
+  --t-xs:   0.8125rem;
+  --t-sm:   0.9375rem;
+  --t-base: 1.0625rem;
+  --t-lg:   clamp(1.15rem, 1.05rem + 0.45vw, 1.35rem);
+  --t-xl:   clamp(1.5rem,  1.3rem  + 0.9vw,  2rem);
+  --t-2xl:  clamp(2rem,    1.6rem  + 1.9vw,  3.25rem);
+
+  --measure: 34rem;
+  --page:    68rem;
+  --gap:     clamp(1.25rem, 1rem + 1.2vw, 2rem);
+  --radius:  10px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ground:    #101413;
+  --surface:   #171C1A;
+  --sunk:      #1E2422;
+  --ink:       #ECEFEA;
+  --body:      #C3CAC5;
+  --muted:     #8B948F;
+  --rule:      #2A322F;
+  --rule-soft: #212927;
+  --accent:    #4FBFAE;
+  --accent-q:  #4FBFAE1F;
+  --clay:      #D8977A;
+  --clay-q:    #D8977A16;
+  --shadow:    0 1px 2px rgba(0, 0, 0, .3);
+}
+
+/* --- reset ---------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--ground);
+  color: var(--body);
+  font-family: var(--f-body);
+  font-size: var(--t-base);
+  line-height: 1.65;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg, video { display: block; max-width: 100%; height: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* --- typography ----------------------------------------------------------- */
+
+h1, h2, h3, h4 {
+  font-family: var(--f-display);
+  color: var(--ink);
+  line-height: 1.15;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--t-2xl); letter-spacing: -0.02em; }
+h2 { font-size: var(--t-xl);  letter-spacing: -0.01em; }
+h3 { font-size: var(--t-lg); }
+
+p { text-wrap: pretty; }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+code, pre { font-family: var(--f-mono); font-size: 0.9em; }
+
+::selection { background: var(--accent-q); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* --- layout primitives ---------------------------------------------------- */
+
+.wrap {
+  width: 100%;
+  max-width: var(--page);
+  margin-inline: auto;
+  padding-inline: var(--gap);
+}
+
+.prose { max-width: var(--measure); }
+.prose > * + * { margin-top: 1rem; }
+
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.skip-link:focus { left: var(--gap); top: var(--gap); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
