@@ -1,17 +1,19 @@
 {
   "name": "crisarji-dev",
   "type": "module",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
+    "predev": "bash scripts/free-port.sh",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "astro": "astro"
+    "astro": "astro",
+    "free-port": "bash scripts/free-port.sh"
   },
   "dependencies": {
     "astro": "^7.2.7"
