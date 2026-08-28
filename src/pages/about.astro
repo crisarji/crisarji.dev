@@ -1,43 +1,89 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import data from "../data/experience.json";
+
+const years = new Date().getFullYear() - data.profile.careerStart;
 ---
 
 <BaseLayout
   title="About"
-  description="Who I am, how I work, and what I'm looking for next."
+  description={`Software engineer in Costa Rica, ${years} years in — ERP back ends, then front-end architecture, design systems and micro frontends.`}
 >
   <article class="wrap page">
     <p class="eyebrow">About</p>
-    <h1>Cris Arji</h1>
+    <h1>Cristian Arce</h1>
 
     <div class="prose">
       <p class="lede">
-        One paragraph on what you build and who you build it for. Replace this.
+        I'm a software engineer in Costa Rica, {years} years in. I started on the
+        back end of ERP systems, moved to the front end, and now lead web
+        practice work for US-based clients — design systems, micro frontends,
+        and the people building them.
       </p>
 
       <p>
-        A second paragraph on how you work — the kind of problems you like, the
-        kind of team you do your best work on, what you reach for by default and
-        what you argue against.
+        The path matters more than the labels. My first years were spent inside
+        Exactus ERP — point-of-sales, electronic invoicing, CRM — for clients
+        across Central America and the Caribbean. That work was unglamorous and
+        it taught me the thing I still lean on: software that handles somebody's
+        money is judged on correctness long before it's judged on anything else.
+        Later, building full-stack for US clients, I spent as much time in
+        stored procedures and query plans as in the UI.
       </p>
 
-      <h2>What I'm looking for</h2>
       <p>
-        Say it plainly. A reader who has got this far is deciding whether to
-        email you, and vagueness here is what stops them.
+        I moved to the front end because the pace of the web stack held my
+        attention, and I stayed because the interesting problems moved there
+        too. Design systems, micro frontends, and the integration seams between
+        them are where most of my recent work has been — the parts where a
+        decision made once gets paid for, or paid off, by every team downstream.
+      </p>
+
+      <h2>How I work</h2>
+      <p>
+        I care about the reasoning behind a stack more than the stack itself.
+        Most technical choices are defensible; what separates them is whether
+        anyone can reconstruct why the choice was made two years later. That's
+        the whole premise of the <a href="/work">case studies</a> on this site —
+        the decision and the rejected alternative, not a list of logos.
+      </p>
+
+      <p>
+        The other half of the job is people. A good part of my time goes to
+        mentorship, career-path conversations, and evaluating candidates, and
+        it's the part I'd least want to give up. It comes from my own time as a
+        student: <em>I teach others the way I wish I had been taught.</em>
+      </p>
+
+      <p>
+        Right now my learning time is going into AI — as a student of it, not as
+        someone claiming production experience yet. When that changes, it'll
+        show up here as a case study rather than a line in a skills list.
       </p>
 
       <h2>Elsewhere</h2>
       <ul class="links">
-        <li>
-          <a href="mailto:crisarji@gmail.com">crisarji@gmail.com</a>
-        </li>
+        <li><a href="mailto:crisarji@gmail.com">crisarji@gmail.com</a></li>
         <li>
           <a href="https://github.com/crisarji" target="_blank" rel="noopener">
             GitHub <span aria-hidden="true">↗</span>
           </a>
         </li>
+        <li>
+          <a
+            href="https://www.linkedin.com/in/cristian-arce-a0757158/"
+            target="_blank"
+            rel="noopener"
+          >
+            LinkedIn <span aria-hidden="true">↗</span>
+          </a>
+        </li>
       </ul>
+      <p class="aside">
+        Email is the reliable one. The <a href="/experience">experience map</a>
+        has the full history, and <a href="/resume">/resume</a> is the same thing
+        as plain text.
+      </p>
     </div>
   </article>
 </BaseLayout>
@@ -50,4 +96,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   h2 { margin-top: 2.5rem; }
   .links { list-style: none; padding: 0; }
   .links li + li { margin-top: 0.35rem; }
+  .aside {
+    margin-top: 1.5rem;
+    font-size: var(--t-sm);
+    color: var(--muted);
+  }
 </style>
