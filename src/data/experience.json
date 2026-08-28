@@ -127,11 +127,10 @@
       "inferred": true
     },
     {
-      "name": "Angular (NgRx)",
+      "name": "Angular",
       "category": "Front end",
-      "from": 2018,
-      "to": null,
-      "inferred": true
+      "from": 2015,
+      "to": null
     },
     {
       "name": "Vue (Vuex)",
