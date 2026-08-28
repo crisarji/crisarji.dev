@@ -43,6 +43,7 @@ const fmt = (iso: string | null) =>
     : "Present";
 
 const categories = [...new Set(tech.map((t) => t.category))];
+const learning = profile.learning;
 const totalYears = AXIS_END - AXIS_START;
 ---
 
@@ -147,6 +148,26 @@ const totalYears = AXIS_END - AXIS_START;
         </p>
       </section>
     </div>
+
+    <section class="learning">
+      <h2>The newest thing</h2>
+      <ul>
+        {learning.items.map((l) => (
+          <li>
+            <span class="what">
+              {l.name}
+              {learning.since && <span class="since"> since {learning.since}</span>}
+            </span>
+            <span class="detail">{l.detail}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="why">
+        Called out rather than buried in the grid: one year against sixteen is
+        a difference worth being straight about, and a skills list that hides
+        it stops meaning anything.
+      </p>
+    </section>
 
     <section class="education">
       <h2>Education &amp; certification</h2>
@@ -348,6 +369,21 @@ const totalYears = AXIS_END - AXIS_START;
   .role .ctx { color: var(--muted); }
   .stations ul { margin-top: 0.9rem; padding-left: 1.1rem; display: grid; gap: 0.45rem; }
   .stations ul li { color: var(--body); font-size: var(--t-sm); text-wrap: pretty; }
+
+  /* --- currently learning ------------------------------------------------ */
+  .learning { margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--rule); max-width: 44rem; }
+  .learning h2 { font-family: var(--f-display); font-size: var(--t-lg); color: var(--ink); }
+  .learning ul { list-style: none; margin-top: 1rem; display: grid; gap: 0.9rem; }
+  .learning li {
+    display: grid;
+    gap: 0.2rem;
+    border-left: 2px dashed var(--rule);
+    padding-left: 1rem;
+  }
+  .what { font-size: var(--t-base); color: var(--ink); font-weight: 500; }
+  .since { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--muted); font-weight: 400; }
+  .detail { font-size: var(--t-sm); color: var(--body); text-wrap: pretty; }
+  .why { margin-top: 1.1rem; font-size: var(--t-sm); color: var(--muted); text-wrap: pretty; }
 
   /* --- education ---------------------------------------------------------- */
   .education { margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--rule); max-width: var(--measure); }

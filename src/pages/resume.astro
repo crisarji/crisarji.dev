@@ -72,6 +72,17 @@ const totalYears = new Date().getFullYear() - profile.careerStart;
     </section>
 
     <section>
+      <h2>The newest thing</h2>
+      <ul class="plain">
+        {profile.learning.items.map((l) => (
+          <li>
+            <strong>{l.name}</strong>{profile.learning.since && ` — since ${profile.learning.since}`} · {l.detail}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section>
       <h2>Education &amp; certification</h2>
       <ul class="plain">
         {profile.education.map((e) => <li>{e.title} — {e.year}</li>)}

@@ -1,17 +1,30 @@
 {
   "_note": "Single source of truth for /experience and /resume. Roles and dates come from the 2022 resume PDF. Entries marked \"inferred\": true were derived from role context rather than stated explicitly — confirm before treating them as fact.",
-
   "profile": {
     "name": "Cristian Arce",
     "careerStart": 2010,
     "summary": "Software engineer who started back-end on ERP systems and moved to the front-end, where the pace of the web stack kept his attention. Now leads web practice work: design systems, micro frontends, and the people building them.",
     "credo": "I teach others the way I wish I had been taught.",
     "education": [
-      { "title": "Computer Science, Bachelor", "year": 2010 },
-      { "title": "Certified SAFe 5 Agilist", "year": 2020 }
-    ]
+      {
+        "title": "Computer Science, Bachelor",
+        "year": 2010
+      },
+      {
+        "title": "Certified SAFe 5 Agilist",
+        "year": 2020
+      }
+    ],
+    "learning": {
+      "since": 2025,
+      "items": [
+        {
+          "name": "AI",
+          "detail": "Self-taught from 2025, and now going into projects. The newest line on the chart by a wide margin — when one of those projects is worth writing up, it will appear in Work rather than as a longer skills list."
+        }
+      ]
+    }
   },
-
   "roles": [
     {
       "id": "gorilla-logic",
@@ -57,26 +70,141 @@
       ]
     }
   ],
-
   "tech": [
-    { "name": "SQL Server",        "category": "Data",     "from": 2010, "to": 2018, "inferred": true },
-    { "name": "MySQL",             "category": "Data",     "from": 2010, "to": 2018, "inferred": true },
-    { "name": "Oracle",            "category": "Data",     "from": 2013, "to": 2018 },
-    { "name": "HTML & CSS",        "category": "Web",      "from": 2013, "to": null, "inferred": true },
-    { "name": "JavaScript",        "category": "Web",      "from": 2013, "to": null, "inferred": true },
-    { "name": "REST services",     "category": "Back end", "from": 2013, "to": null },
-    { "name": "Node.js",           "category": "Back end", "from": 2018, "to": null, "inferred": true },
-    { "name": "TypeScript",        "category": "Web",      "from": 2018, "to": null, "inferred": true },
-    { "name": "Angular (NgRx)",    "category": "Front end","from": 2018, "to": null, "inferred": true },
-    { "name": "Vue (Vuex)",        "category": "Front end","from": 2018, "to": null, "inferred": true },
-    { "name": "React (Hooks)",     "category": "Front end","from": 2018, "to": null, "inferred": true },
-    { "name": "Next.js",           "category": "Front end","from": 2018, "to": null, "inferred": true },
-    { "name": "Gatsby",            "category": "Front end","from": 2018, "to": null, "inferred": true },
-    { "name": "Design systems",    "category": "Front end","from": 2018, "to": null },
-    { "name": "Micro frontends",   "category": "Front end","from": 2018, "to": null },
-    { "name": "Testing (Cypress, Jest, Storybook)", "category": "Quality", "from": 2018, "to": null, "inferred": true },
-    { "name": "Docker & Jenkins",  "category": "Platform", "from": 2018, "to": null, "inferred": true },
-    { "name": "AWS & GCP",         "category": "Platform", "from": 2018, "to": null, "inferred": true },
-    { "name": "GitHub Actions",    "category": "Platform", "from": 2018, "to": null, "inferred": true }
+    {
+      "name": "SQL Server",
+      "category": "Data",
+      "from": 2010,
+      "to": 2018,
+      "inferred": true
+    },
+    {
+      "name": "MySQL",
+      "category": "Data",
+      "from": 2010,
+      "to": 2018,
+      "inferred": true
+    },
+    {
+      "name": "Oracle",
+      "category": "Data",
+      "from": 2013,
+      "to": 2018
+    },
+    {
+      "name": "HTML & CSS",
+      "category": "Web",
+      "from": 2013,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "JavaScript",
+      "category": "Web",
+      "from": 2013,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "REST services",
+      "category": "Back end",
+      "from": 2013,
+      "to": null
+    },
+    {
+      "name": "Node.js",
+      "category": "Back end",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "TypeScript",
+      "category": "Web",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "Angular (NgRx)",
+      "category": "Front end",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "Vue (Vuex)",
+      "category": "Front end",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "React (Hooks)",
+      "category": "Front end",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "Next.js",
+      "category": "Front end",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "Gatsby",
+      "category": "Front end",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "Design systems",
+      "category": "Front end",
+      "from": 2018,
+      "to": null
+    },
+    {
+      "name": "Micro frontends",
+      "category": "Front end",
+      "from": 2018,
+      "to": null
+    },
+    {
+      "name": "Testing (Cypress, Jest, Storybook)",
+      "category": "Quality",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "Docker & Jenkins",
+      "category": "Platform",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "AWS & GCP",
+      "category": "Platform",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "GitHub Actions",
+      "category": "Platform",
+      "from": 2018,
+      "to": null,
+      "inferred": true
+    },
+    {
+      "name": "AI",
+      "category": "AI",
+      "from": 2025,
+      "to": null
+    }
   ]
 }
