@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,4 +12,10 @@ export default defineConfig({
     // asset server and `trailingSlash: never` agree on the canonical URL.
     format: "file",
   },
+  integrations: [
+    sitemap({
+      // The generated OG images are assets, not pages worth crawling.
+      filter: (page) => !page.includes("/og/"),
+    }),
+  ],
 });

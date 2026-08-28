@@ -20,7 +20,7 @@ const { title, blurb, role, period, stack, liveUrl, repoUrl, confidential } =
 const { Content } = await render(project);
 ---
 
-<BaseLayout title={title} description={blurb}>
+<BaseLayout title={title} description={blurb} ogImage={`/og/${project.id}.png`}>
   <article class="wrap page">
     <header>
       <p class="eyebrow">Case study</p>
