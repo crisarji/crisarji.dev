@@ -1,0 +1,164 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import data from "../data/experience.json";
+
+const { profile, roles, tech } = data;
+
+/* The ATS-safe twin of /experience: same JSON, no chart, plain selectable text
+   that survives being pasted into a form. The PDF is this page printed. */
+
+const fmt = (iso: string | null) =>
+  iso
+    ? new Date(`${iso}-01T00:00:00Z`).toLocaleDateString("en", {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+    : "Present";
+
+const categories = [...new Set(tech.map((t) => t.category))];
+const totalYears = new Date().getFullYear() - profile.careerStart;
+---
+
+<BaseLayout
+  title="Resume"
+  description={`${profile.name} — software engineer, ${totalYears}+ years. Plain-text resume.`}
+>
+  <article class="wrap resume">
+    <header>
+      <h1>{profile.name}</h1>
+      <p class="tagline">Software engineer · {totalYears}+ years · Costa Rica</p>
+      <p class="actions">
+        <a href="/experience">See it as a timeline</a>
+        <span aria-hidden="true">·</span>
+        <button type="button" id="print">Print or save as PDF</button>
+      </p>
+    </header>
+
+    <section>
+      <h2>Summary</h2>
+      <p>{profile.summary}</p>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      {roles.map((r) => (
+        <div class="role">
+          <h3>
+            {r.title} — {r.org}
+            {r.orgNote && <span class="note"> ({r.orgNote})</span>}
+          </h3>
+          <p class="meta">
+            {fmt(r.start)} – {fmt(r.end)}{r.context && ` · ${r.context}`}
+          </p>
+          <ul>
+            {r.highlights.map((h) => <li>{h}</li>)}
+          </ul>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Technical skills</h2>
+      <dl>
+        {categories.map((cat) => (
+          <div class="skill-row">
+            <dt>{cat}</dt>
+            <dd>{tech.filter((t) => t.category === cat).map((t) => t.name).join(", ")}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section>
+      <h2>Education &amp; certification</h2>
+      <ul class="plain">
+        {profile.education.map((e) => <li>{e.title} — {e.year}</li>)}
+      </ul>
+    </section>
+  </article>
+</BaseLayout>
+
+<script>
+  document.getElementById("print")?.addEventListener("click", () => window.print());
+</script>
+
+<style>
+  .resume {
+    max-width: 46rem;
+    padding-block: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  h1 {
+    font-family: var(--f-display);
+    font-size: var(--t-2xl);
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .tagline { color: var(--muted); margin-top: 0.3rem; }
+
+  .actions {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--t-sm);
+    color: var(--muted);
+  }
+  .actions button {
+    font: inherit;
+    color: var(--accent);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  section { margin-top: 2.5rem; }
+  h2 {
+    font-family: var(--f-display);
+    font-size: var(--t-lg);
+    color: var(--ink);
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  section > p { margin-top: 0.9rem; color: var(--body); text-wrap: pretty; }
+
+  .role { margin-top: 1.75rem; }
+  .role h3 { font-size: var(--t-base); color: var(--ink); font-weight: 600; }
+  .role h3 .note { font-weight: 400; color: var(--muted); }
+  .meta {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+  .role ul { margin-top: 0.7rem; padding-left: 1.1rem; display: grid; gap: 0.4rem; }
+  .role li { color: var(--body); font-size: var(--t-sm); text-wrap: pretty; }
+
+  dl { margin-top: 1rem; display: grid; gap: 0.6rem; }
+  .skill-row { display: grid; grid-template-columns: 8rem 1fr; gap: 1rem; }
+  dt { font-size: var(--t-sm); color: var(--muted); }
+  dd { font-size: var(--t-sm); color: var(--body); }
+
+  ul.plain { list-style: none; margin-top: 1rem; display: grid; gap: 0.4rem; }
+  ul.plain li { color: var(--body); font-size: var(--t-sm); }
+
+  @media (max-width: 34rem) {
+    .skill-row { grid-template-columns: 1fr; gap: 0.15rem; }
+  }
+
+  /* --- print: this is the PDF ------------------------------------------- */
+  @media print {
+    .actions { display: none; }
+    .resume { max-width: none; padding: 0; }
+    h1 { font-size: 20pt; }
+    h2 { font-size: 12pt; margin-top: 16pt; }
+    .role h3 { font-size: 10.5pt; }
+    .role li, dd, dt, ul.plain li, section > p { font-size: 9.5pt; }
+    section { margin-top: 12pt; }
+    .role { margin-top: 10pt; page-break-inside: avoid; }
+  }
+</style>
