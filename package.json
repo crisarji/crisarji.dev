@@ -9,7 +9,7 @@
   "scripts": {
     "predev": "bash scripts/free-port.sh",
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && printf 'npm %s\\nnode %s\\nua %s\\n' \"$(npm -v)\" \"$(node -v)\" \"$npm_config_user_agent\" > dist/_build-env.txt",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",
