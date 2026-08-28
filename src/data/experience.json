@@ -1,5 +1,5 @@
 {
-  "_note": "Single source of truth for /experience and /resume. Roles and dates come from the 2022 resume PDF. Entries marked \"inferred\": true were derived from role context rather than stated explicitly — confirm before treating them as fact.",
+  "_note": "Single source of truth for /experience and /resume. Roles come from the 2022 resume; the Gorilla Logic tenure is confirmed current through 2026. Entries marked \"inferred\": true were derived from role context rather than stated explicitly — confirm before treating them as fact.",
   "profile": {
     "name": "Cristian Arce",
     "careerStart": 2010,
@@ -35,6 +35,7 @@
       "context": "US-based clients",
       "highlights": [
         "Led the front-end of client applications built on design systems, integrating with microservice APIs.",
+        "From 2022, work has centred on a long-running client project for a travel agency.",
         "Improved and optimised micro frontends across JS frameworks.",
         "Designed and implemented CI/CD with platform teams; supported production deploys, hot fixes and enhancements.",
         "Mentorship, career-path support and candidate evaluation; drove web initiatives across the company.",
