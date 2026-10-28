@@ -1,60 +1,150 @@
 /* ---------------------------------------------------------------------------
-   Design tokens. Palette carried over from the build-plan document so the site
-   and its plan share an identity. Light values live on :root; dark mode only
-   redefines the tokens, never the rules that consume them.
+   Design tokens — "modern product" set.
+
+   Replaces the editorial/serif palette the site launched with. Two deliberate
+   carry-overs: the token NAMES are unchanged, so pages not yet rebuilt keep
+   working, and the accent stays in the teal family so the identity has lineage.
+
+   Dark values are declared TWICE on purpose: once behind prefers-color-scheme
+   so the page is correct before (or without) the inline theme script, and once
+   on [data-theme="dark"] so the toggle can override the system. Keep the two
+   blocks in sync.
 --------------------------------------------------------------------------- */
 
 :root {
   color-scheme: light;
 
-  --ground:    #F1F3EF;
-  --surface:   #FAFBF8;
-  --sunk:      #E8EBE5;
-  --ink:       #151B19;
-  --body:      #2C3532;
-  --muted:     #5D6763;
-  --rule:      #D8DDD4;
-  --rule-soft: #E4E8E0;
-  --accent:    #0C6C61;
-  --accent-q:  #0C6C6118;
-  --clay:      #96543A;
-  --clay-q:    #96543A14;
-  --shadow:    0 1px 2px rgba(21, 27, 25, .05);
+  /* Surfaces, coolest to warmest in depth order. */
+  --ground:    #F3F4F8;
+  --surface:   #FFFFFF;
+  --sunk:      #F1F2F6;
+  --veil:      rgba(255, 255, 255, 0.86);  /* glass fills */
 
-  --f-display: "Fraunces", Georgia, "Times New Roman", serif;
-  --f-body:    "Karla", "Helvetica Neue", Arial, sans-serif;
-  --f-mono:    ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  /* Text. */
+  --ink:       #0B0D13;
+  --body:      #3A4050;
+  --muted:     #697086;
+  --faint:     #969CAE;
 
-  /* Fluid type: min at 360px, max at 1200px. */
+  /* Lines. */
+  --rule:      #E2E4EC;
+  --rule-soft: #EDEEF4;
+
+  /* Accent: teal primary, indigo partner. The pair is what makes the
+     gradients read as intentional rather than as a template default. */
+  --accent:    #047E72;
+  --accent-2:  #4338CA;
+  --accent-q:  rgba(4, 126, 114, 0.10);
+  --accent-ink: #FFFFFF;
+
+  --grad: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  --grad-soft: linear-gradient(
+    135deg,
+    rgba(4, 126, 114, 0.14) 0%,
+    rgba(67, 56, 202, 0.12) 100%
+  );
+
+  /* Elevation. Layered rather than single-blur, which is most of what makes
+     depth read as real instead of as a drop shadow. */
+  --e-1: 0 1px 2px rgba(11, 13, 19, 0.05),
+         0 1px 1px rgba(11, 13, 19, 0.03);
+  --e-2: 0 2px 4px rgba(11, 13, 19, 0.05),
+         0 6px 12px rgba(11, 13, 19, 0.05);
+  --e-3: 0 4px 8px rgba(11, 13, 19, 0.05),
+         0 16px 32px rgba(11, 13, 19, 0.08);
+  --ring: 0 0 0 1px var(--rule);
+
+  /* Type. One neutral family with weight contrast, plus a mono with enough
+     personality to carry labels and figures. */
+  --f-display: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --f-body:    "Inter", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:    "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
   --t-xs:   0.8125rem;
   --t-sm:   0.9375rem;
   --t-base: 1.0625rem;
   --t-lg:   clamp(1.15rem, 1.05rem + 0.45vw, 1.35rem);
-  --t-xl:   clamp(1.5rem,  1.3rem  + 0.9vw,  2rem);
-  --t-2xl:  clamp(2rem,    1.6rem  + 1.9vw,  3.25rem);
+  --t-xl:   clamp(1.5rem,  1.28rem + 1vw,    2.1rem);
+  --t-2xl:  clamp(2.1rem,  1.6rem  + 2.3vw,  3.6rem);
+  --t-3xl:  clamp(2.6rem,  1.8rem  + 3.6vw,  5rem);
 
   --measure: 34rem;
-  --page:    68rem;
+  --page:    70rem;
   --gap:     clamp(1.25rem, 1rem + 1.2vw, 2rem);
-  --radius:  10px;
+
+  --radius:    12px;
+  --radius-lg: 20px;
+  --radius-sm: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --ground:    #07080C;
+    --surface:   #0E1017;
+    --sunk:      #14161F;
+    --veil:      rgba(255, 255, 255, 0.04);
+
+    --ink:       #F3F5F9;
+    --body:      #B7BECE;
+    --muted:     #7E8699;
+    --faint:     #5B6274;
+
+    --rule:      #232834;
+    --rule-soft: #191D26;
+
+    --accent:    #2DD4BF;
+    --accent-2:  #8B8CF7;
+    --accent-q:  rgba(45, 212, 191, 0.12);
+    --accent-ink: #04221F;
+
+    --grad-soft: linear-gradient(
+      135deg,
+      rgba(45, 212, 191, 0.16) 0%,
+      rgba(139, 140, 247, 0.14) 100%
+    );
+
+    --e-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --e-2: 0 2px 4px rgba(0, 0, 0, 0.4),
+           0 6px 16px rgba(0, 0, 0, 0.4);
+    --e-3: 0 4px 8px rgba(0, 0, 0, 0.4),
+           0 20px 40px rgba(0, 0, 0, 0.5);
+  }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --ground:    #101413;
-  --surface:   #171C1A;
-  --sunk:      #1E2422;
-  --ink:       #ECEFEA;
-  --body:      #C3CAC5;
-  --muted:     #8B948F;
-  --rule:      #2A322F;
-  --rule-soft: #212927;
-  --accent:    #4FBFAE;
-  --accent-q:  #4FBFAE1F;
-  --clay:      #D8977A;
-  --clay-q:    #D8977A16;
-  --shadow:    0 1px 2px rgba(0, 0, 0, .3);
+  --ground:    #07080C;
+  --surface:   #0E1017;
+  --sunk:      #14161F;
+  --veil:      rgba(255, 255, 255, 0.04);
+
+  --ink:       #F3F5F9;
+  --body:      #B7BECE;
+  --muted:     #7E8699;
+  --faint:     #5B6274;
+
+  --rule:      #232834;
+  --rule-soft: #191D26;
+
+  --accent:    #2DD4BF;
+  --accent-2:  #8B8CF7;
+  --accent-q:  rgba(45, 212, 191, 0.12);
+  --accent-ink: #04221F;
+
+  --grad-soft: linear-gradient(
+    135deg,
+    rgba(45, 212, 191, 0.16) 0%,
+    rgba(139, 140, 247, 0.14) 100%
+  );
+
+  --e-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --e-2: 0 2px 4px rgba(0, 0, 0, 0.4),
+         0 6px 16px rgba(0, 0, 0, 0.4);
+  --e-3: 0 4px 8px rgba(0, 0, 0, 0.4),
+         0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
 /* --- reset ---------------------------------------------------------------- */
@@ -62,18 +152,22 @@
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
 
 body {
   background: var(--ground);
   color: var(--body);
   font-family: var(--f-body);
   font-size: var(--t-base);
-  line-height: 1.65;
+  line-height: 1.6;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
 }
 
 img, svg, video { display: block; max-width: 100%; height: auto; }
@@ -84,18 +178,24 @@ button, input, select, textarea { font: inherit; color: inherit; }
 h1, h2, h3, h4 {
   font-family: var(--f-display);
   color: var(--ink);
-  line-height: 1.15;
+  line-height: 1.1;
   font-weight: 600;
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
 
-h1 { font-size: var(--t-2xl); letter-spacing: -0.02em; }
-h2 { font-size: var(--t-xl);  letter-spacing: -0.01em; }
+h1 { font-size: var(--t-2xl); letter-spacing: -0.035em; }
+h2 { font-size: var(--t-xl); letter-spacing: -0.03em; }
 h3 { font-size: var(--t-lg); }
 
 p { text-wrap: pretty; }
 
-a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color var(--dur-1, 120ms) var(--ease-out, ease);
+}
 a:hover { text-decoration-thickness: 2px; }
 
 code, pre { font-family: var(--f-mono); font-size: 0.9em; }
@@ -105,7 +205,7 @@ code, pre { font-family: var(--f-mono); font-size: 0.9em; }
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 /* --- layout primitives ---------------------------------------------------- */
@@ -120,10 +220,13 @@ code, pre { font-family: var(--f-mono); font-size: 0.9em; }
 .prose { max-width: var(--measure); }
 .prose > * + * { margin-top: 1rem; }
 
+/* Labels and figures live in the mono. This is the site's one piece of
+   typographic personality — keep it for data, not for prose. */
 .eyebrow {
   font-family: var(--f-mono);
   font-size: var(--t-xs);
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -137,14 +240,7 @@ code, pre { font-family: var(--f-mono); font-size: 0.9em; }
   color: var(--ink);
   padding: 0.6rem 1rem;
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--e-2);
 }
 .skip-link:focus { left: var(--gap); top: var(--gap); }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}

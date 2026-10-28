@@ -30,8 +30,8 @@ const totalYears = new Date().getFullYear() - profile.careerStart;
       <h1>{profile.name}</h1>
       <p class="tagline">Software engineer · {totalYears}+ years · Costa Rica</p>
       <p class="actions">
-        <a href="/experience">See it as a timeline</a>
-        <span aria-hidden="true">·</span>
+        <!-- The timeline link comes back with /experience in phase 4; until
+             then it would redirect to the holding page. -->
         <button type="button" id="print">Print or save as PDF</button>
       </p>
     </header>

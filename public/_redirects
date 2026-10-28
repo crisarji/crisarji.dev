@@ -1,0 +1,8 @@
+# The rebuild (phase 0) took these pages down behind the holding page. 302 and
+# not 301: they are coming back at the same URLs, and a cached permanent
+# redirect would outlive the holding page in people's browsers.
+/about     /  302
+/work      /  302
+/work/*    /  302
+/experience /  302
+/rss.xml   /  302

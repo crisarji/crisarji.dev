@@ -1,13 +1,10 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
 
-const links = [
-  { href: "/work", label: "Work" },
-  { href: "/experience", label: "Experience" },
-  { href: "/about", label: "About" },
-];
+/* The site is mid-rebuild: /work, /experience and /about are off the air, so
+   they are not listed. Restore them here as each one lands. */
+const links = [{ href: "/resume", label: "Resume" }];
 
-// Mark the section active for /work as well as /work/some-project.
 const path = Astro.url.pathname;
 const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
 ---
@@ -36,15 +33,19 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
 
 <style>
   header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     border-bottom: 1px solid var(--rule-soft);
-    background: var(--ground);
+    background: color-mix(in srgb, var(--ground) 82%, transparent);
+    backdrop-filter: blur(12px) saturate(140%);
   }
 
   .bar {
     display: flex;
     align-items: center;
     gap: clamp(1rem, 4vw, 2.5rem);
-    min-height: 4.25rem;
+    min-height: 4rem;
   }
 
   .mark {
@@ -53,10 +54,10 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
     font-size: var(--t-sm);
     color: var(--ink);
     text-decoration: none;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     margin-right: auto;
   }
-  .mark span { color: var(--muted); }
+  .mark span { color: var(--faint); }
   .mark:hover span { color: var(--accent); }
 
   nav ul {
@@ -72,6 +73,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
     font-size: var(--t-sm);
     padding-block: 0.35rem;
     border-bottom: 1.5px solid transparent;
+    transition: color var(--dur-1) var(--ease-out);
   }
   nav a:hover { color: var(--ink); }
   nav a[aria-current="page"] {

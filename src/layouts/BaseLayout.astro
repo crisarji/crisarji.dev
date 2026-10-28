@@ -2,16 +2,18 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
+import "../styles/motion.css";
 
 interface Props {
   title: string;
   description: string;
-  /** Per-page social card. Generated cards arrive in phase 4; until then the
-   *  og:image tag is simply omitted rather than pointing at a missing file. */
   ogImage?: string;
+  /** Pages that supply their own full-bleed composition (the holding page)
+   *  opt out of the site header and footer. */
+  chrome?: boolean;
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, chrome = true } = Astro.props;
 
 const siteName = "crisarji";
 const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
@@ -28,12 +30,6 @@ const ogUrl = ogImage ? new URL(ogImage, Astro.site) : undefined;
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title="crisarji — case studies"
-      href={new URL("/rss.xml", Astro.site)}
-    />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={fullTitle} />
@@ -43,27 +39,29 @@ const ogUrl = ogImage ? new URL(ogImage, Astro.site) : undefined;
     {ogUrl && <meta property="og:image" content={ogUrl} />}
     <meta name="twitter:card" content={ogUrl ? "summary_large_image" : "summary"} />
 
-    <!-- Fonts: two families only, per the performance budget. -->
+    <!-- Two families: Inter carries everything, the mono carries labels and
+         figures. Keep it at two — the budget assumes it. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Karla:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
     />
 
     <!--
-      Theme must be resolved before first paint or the page flashes white.
+      Theme must be resolved before first paint or the page flashes.
       Inline and synchronous on purpose — do not move this to a module script.
+      The stylesheet also answers prefers-color-scheme on its own, so a browser
+      that never runs this still gets the right theme; the attribute exists so
+      the toggle can override the system preference.
     -->
     <script is:inline>
       (() => {
         try {
           const stored = localStorage.getItem("theme");
-          const system = matchMedia("(prefers-color-scheme: dark)").matches;
-          const theme = stored ?? (system ? "dark" : "light");
-          document.documentElement.dataset.theme = theme;
+          if (stored) document.documentElement.dataset.theme = stored;
         } catch {
-          /* Private mode or blocked storage: fall through to the light default. */
+          /* Blocked storage: the media query in global.css still applies. */
         }
       })();
     </script>
@@ -71,10 +69,10 @@ const ogUrl = ogImage ? new URL(ogImage, Astro.site) : undefined;
 
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Header />
+    {chrome && <Header />}
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    {chrome && <Footer />}
   </body>
 </html>

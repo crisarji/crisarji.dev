@@ -15,14 +15,21 @@
     width: 2.25rem;
     height: 2.25rem;
     padding: 0;
-    background: transparent;
+    background: var(--veil);
     border: 1px solid var(--rule);
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     color: var(--muted);
     cursor: pointer;
-    transition: color 120ms ease, border-color 120ms ease;
+    transition:
+      color var(--dur-1) var(--ease-out),
+      border-color var(--dur-1) var(--ease-out),
+      transform var(--dur-2) var(--ease-out);
   }
-  button:hover { color: var(--ink); border-color: var(--accent); }
+  button:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+    transform: var(--lift);
+  }
 
   svg {
     fill: none;
@@ -32,16 +39,33 @@
     grid-area: 1 / 1;
   }
 
-  /* Show the icon for the theme you would switch TO. */
+  /* Show the icon for the theme you would switch TO. Dark can arrive either
+     from the system preference or from the attribute, so both are handled —
+     and the attribute rules come last so an explicit choice wins. */
   .sun { display: none; }
+  .moon { display: block; }
+
+  @media (prefers-color-scheme: dark) {
+    :global(html:not([data-theme="light"])) .sun { display: block; }
+    :global(html:not([data-theme="light"])) .moon { display: none; }
+  }
+
   :global(html[data-theme="dark"]) .sun { display: block; }
   :global(html[data-theme="dark"]) .moon { display: none; }
+  :global(html[data-theme="light"]) .sun { display: none; }
+  :global(html[data-theme="light"]) .moon { display: block; }
 </style>
 
 <script is:inline>
   document.getElementById("theme-toggle")?.addEventListener("click", () => {
     const root = document.documentElement;
-    const next = root.dataset.theme === "dark" ? "light" : "dark";
+    // The attribute is absent until someone chooses, so read through to the
+    // system preference first. Flipping the attribute blind would be a no-op
+    // on a machine whose system theme already matches.
+    const current =
+      root.dataset.theme ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = current === "dark" ? "light" : "dark";
     root.dataset.theme = next;
     try {
       localStorage.setItem("theme", next);
