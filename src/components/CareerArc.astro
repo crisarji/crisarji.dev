@@ -1,0 +1,296 @@
+---
+import {
+  makeAxis,
+  fromIso,
+  fromYear,
+  bar,
+  pct,
+  ticks,
+  type Axis,
+} from "../lib/timeline";
+
+interface Role {
+  id: string;
+  org: string;
+  title: string;
+  start: string;
+  end: string | null;
+}
+
+interface Tech {
+  name: string;
+  category: string;
+  from: number;
+  to: number | null;
+  inferred?: boolean;
+}
+
+interface Props {
+  roles: Role[];
+  tech: Tech[];
+  axis: Axis;
+}
+
+const { roles, tech, axis } = Astro.props;
+
+/* Oldest first, so every figure reads left to right like the axis itself. */
+const roleRows = [...roles].reverse().map((r, i) => ({
+  org: r.org,
+  from: r.start.slice(0, 4),
+  to: r.end ? r.end.slice(0, 4) : "now",
+  ...bar(fromIso(r.start, axis), fromIso(r.end, axis), axis),
+  delay: `${i * 90}ms`,
+}));
+
+const categories = [...new Set(tech.map((t) => t.category))];
+
+const techRows = categories.map((cat) => ({
+  cat,
+  items: tech
+    .filter((t) => t.category === cat)
+    .map((t) => ({
+      name: t.name,
+      inferred: t.inferred === true,
+      from: t.from,
+      to: t.to ?? "now",
+      ...bar(
+        fromYear(t.from, axis, "start"),
+        fromYear(t.to, axis, "end"),
+        axis,
+      ),
+    })),
+}));
+
+const years = ticks(axis, 4);
+/* One gridline every four years, as a fraction of the whole axis. */
+const tick = `${((48 / axis.span) * 100).toFixed(3)}%`;
+
+const inferredCount = tech.filter((t) => t.inferred).length;
+---
+
+<figure class="arc" style={`--tick:${tick}`}>
+  <div class="scale" aria-hidden="true">
+    {
+      years.map((y) => (
+        <span style={`left:${pct(fromYear(y, axis, "start"), axis)}`}>{y}</span>
+      ))
+    }
+  </div>
+
+  <p class="eyebrow band">Roles</p>
+  <ol class="rows roles">
+    {
+      roleRows.map((r) => (
+        <li class:list={["row", r.current && "is-current"]}>
+          <span class="label">{r.org}</span>
+          <span class="track">
+            <span
+              class="fill draw"
+              style={`left:${r.left};width:${r.width};--c-from:${r.cFrom};--c-to:${r.cTo};--delay:${r.delay}`}
+            />
+          </span>
+          <span class="range">
+            {r.from}<span class="dash">–</span>{r.to}
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="stack">
+    <p class="eyebrow band">Stack</p>
+    {
+      techRows.map((g) => (
+        <>
+          <p class="cat">{g.cat}</p>
+          <ol class="rows">
+            {g.items.map((t) => (
+              <li class:list={["row", "thin", t.inferred && "is-approx"]}>
+                <span class="label">{t.name}</span>
+                <span class="track">
+                  <span
+                    class="fill"
+                    style={`left:${t.left};width:${t.width};--c-from:${t.cFrom};--c-to:${t.cTo}`}
+                  />
+                </span>
+                <span class="range">
+                  {t.inferred && <span class="tilde">~</span>}
+                  {t.from}<span class="dash">–</span>{t.to}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </>
+      ))
+    }
+  </div>
+
+  <figcaption>
+    Hatched bars are approximate: {inferredCount} of {tech.length} start dates
+    were derived from role context rather than recorded, and cluster at 2018 as
+    an artefact of that. The roles are exact.
+  </figcaption>
+</figure>
+
+<style>
+  .arc {
+    --label: 11rem;
+    --range: 5.5rem;
+    position: relative;
+    margin-top: 2rem;
+  }
+
+  /* --- year scale --------------------------------------------------------- */
+
+  .scale {
+    position: relative;
+    height: 1.4rem;
+    margin-left: calc(var(--label) + 0.9rem);
+    margin-right: calc(var(--range) + 0.9rem);
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    color: var(--faint);
+  }
+  .scale span {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+  }
+  /* The first and last labels would hang off the figure. */
+  .scale span:first-child { transform: none; }
+  .scale span:last-child { transform: translateX(-100%); }
+
+  /* --- rows --------------------------------------------------------------- */
+
+  .band { margin-top: 0.5rem; }
+
+  .rows {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.6rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: var(--label) 1fr var(--range);
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .label {
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--ink);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .track {
+    position: relative;
+    height: 0.85rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+    /* Gridlines live on the track so they stay aligned with the bars without
+       a separate absolutely-positioned layer to keep in sync. */
+    background-image: repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ink) 11%, transparent) 0 1px,
+      transparent 1px var(--tick)
+    );
+  }
+
+  .fill {
+    position: absolute;
+    inset-block: 0;
+    border-radius: 999px;
+    transform-origin: left center;
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--accent-2) var(--c-from), var(--accent)) 0%,
+      color-mix(in oklab, var(--accent-2) var(--c-to), var(--accent)) 100%
+    );
+  }
+
+  .is-current .fill {
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent),
+      0 0 16px color-mix(in srgb, var(--accent) 42%, transparent);
+  }
+
+  .range {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .dash { color: var(--faint); padding-inline: 0.1em; }
+  .tilde { color: var(--faint); }
+
+  /* --- the stack ---------------------------------------------------------- */
+
+  .stack { margin-top: 1.75rem; }
+
+  .cat {
+    margin-top: 1.1rem;
+    font-size: var(--t-xs);
+    font-weight: 500;
+    color: var(--faint);
+    letter-spacing: 0.02em;
+  }
+
+  .row.thin .track { height: 0.4rem; }
+  .row.thin { gap: 0.9rem; }
+  .row.thin .label { font-size: var(--t-xs); color: var(--body); }
+
+  /* Approximate dates must not look as certain as recorded ones. */
+  .is-approx .fill {
+    opacity: 0.6;
+  }
+  .is-approx .fill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: repeating-linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--ground) 65%, transparent) 0 2px,
+      transparent 2px 5px
+    );
+  }
+
+  figcaption {
+    margin-top: 1.75rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--rule-soft);
+    font-size: var(--t-xs);
+    color: var(--muted);
+    max-width: 44rem;
+  }
+
+  /* --- narrow -------------------------------------------------------------- */
+
+  @media (max-width: 54rem) {
+    .arc { --label: 7.5rem; --range: 5rem; }
+    .row { gap: 0.6rem; }
+  }
+
+  @media (max-width: 40rem) {
+    /* Twenty labelled bars will not survive a phone. The roles stay, since
+       they are the spine of the figure; the stack is listed in full, with the
+       same dates, in the Skills section directly below. */
+    .stack { display: none; }
+    .arc { --label: 6.5rem; --range: 4.75rem; }
+    .label { font-size: var(--t-xs); }
+
+    /* Five year labels collide once the track is phone-width. Drop every
+       other one, which leaves the two ends and the midpoint; the gridlines
+       stay at four-year spacing regardless. */
+    .scale { font-size: 0.6875rem; }
+    .scale span:nth-child(even) { display: none; }
+  }
+</style>

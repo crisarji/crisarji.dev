@@ -1,12 +1,16 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
 
-/* The site is mid-rebuild: /work, /experience and /about are off the air, so
-   they are not listed. Restore them here as each one lands. */
-const links = [{ href: "/resume", label: "Resume" }];
+/* Anchors are absolute so the nav also works from /resume. /work and
+   /experience return in phases 5 and 4. */
+const links = [
+  { href: "/#trajectory", label: "Trajectory" },
+  { href: "/#skills", label: "Skills" },
+  { href: "/#about", label: "About" },
+  { href: "/resume", label: "Resume" },
+];
 
 const path = Astro.url.pathname;
-const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
 ---
 
 <header>
@@ -18,7 +22,10 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
         {
           links.map((link) => (
             <li>
-              <a href={link.href} aria-current={isActive(link.href) ? "page" : undefined}>
+              <a
+                href={link.href}
+                aria-current={path === link.href ? "page" : undefined}
+              >
                 {link.label}
               </a>
             </li>
@@ -44,7 +51,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
   .bar {
     display: flex;
     align-items: center;
-    gap: clamp(1rem, 4vw, 2.5rem);
+    gap: clamp(0.75rem, 4vw, 2.5rem);
     min-height: 4rem;
   }
 
@@ -56,13 +63,14 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
     text-decoration: none;
     letter-spacing: -0.02em;
     margin-right: auto;
+    flex: none;
   }
   .mark span { color: var(--faint); }
   .mark:hover span { color: var(--accent); }
 
   nav ul {
     display: flex;
-    gap: clamp(1rem, 3vw, 1.75rem);
+    gap: clamp(0.75rem, 2.5vw, 1.6rem);
     list-style: none;
     padding: 0;
   }
@@ -74,10 +82,16 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
     padding-block: 0.35rem;
     border-bottom: 1.5px solid transparent;
     transition: color var(--dur-1) var(--ease-out);
+    white-space: nowrap;
   }
   nav a:hover { color: var(--ink); }
   nav a[aria-current="page"] {
     color: var(--ink);
     border-bottom-color: var(--accent);
+  }
+
+  /* The wordmark is the home link; the section anchors would wrap badly. */
+  @media (max-width: 34rem) {
+    nav li:not(:last-child) { display: none; }
   }
 </style>

@@ -1,0 +1,142 @@
+---
+interface Tech {
+  name: string;
+  category: string;
+  from: number;
+  to: number | null;
+  inferred?: boolean;
+}
+
+interface Props {
+  tech: Tech[];
+  /** Used to phrase an open-ended range as "16 years" rather than "to now". */
+  now: number;
+}
+
+const { tech, now } = Astro.props;
+
+const categories = [...new Set(tech.map((t) => t.category))].map((cat) => {
+  const items = tech
+    .filter((t) => t.category === cat)
+    .map((t) => ({
+      ...t,
+      years: (t.to ?? now) - t.from + 1,
+      open: t.to === null,
+    }))
+    // Longest-running first: the depth is the point, not the alphabet.
+    .sort((a, b) => b.years - a.years);
+
+  return { cat, items, span: Math.max(...items.map((i) => i.years)) };
+});
+---
+
+<div class="grid">
+  {
+    categories.map((g) => (
+      <section class="cat reveal">
+        <h3>{g.cat}</h3>
+        <ul>
+          {g.items.map((t) => (
+            <li class:list={[t.open && "is-open"]}>
+              <span class="name">{t.name}</span>
+              <span class="meta">
+                <span class="years">
+                  {t.years}
+                  <span class="unit">{t.years === 1 ? "yr" : "yrs"}</span>
+                </span>
+                <span class="range">
+                  {t.inferred && <span class="tilde" title="Approximate">~</span>}
+                  {t.from}<span class="dash">–</span>{t.to ?? "now"}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  /* Column packing, not grid: a category with one entry should not be
+     stretched to the height of one with seven. */
+  .grid {
+    margin-top: 2rem;
+    columns: 17rem;
+    column-gap: 0.75rem;
+  }
+
+  .cat {
+    break-inside: avoid;
+    margin-bottom: 0.75rem;
+    padding: 1.1rem 1.25rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--e-1);
+  }
+
+  h3 {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.85rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  li:last-child { padding-bottom: 0; border-bottom: 0; }
+
+  .name {
+    font-size: var(--t-sm);
+    color: var(--ink);
+    min-width: 0;
+  }
+  .is-open .name { font-weight: 500; }
+
+  .meta {
+    display: grid;
+    justify-items: end;
+    gap: 0.05rem;
+    flex: none;
+  }
+
+  .years {
+    font-family: var(--f-mono);
+    font-size: var(--t-sm);
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .unit {
+    font-size: 0.75em;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 0.15em;
+  }
+
+  .range {
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+    color: var(--faint);
+    white-space: nowrap;
+  }
+  .dash { padding-inline: 0.1em; }
+  .tilde { color: var(--muted); }
+</style>

@@ -1,69 +1,59 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import ThemeToggle from "../components/ThemeToggle.astro";
+import CareerArc from "../components/CareerArc.astro";
+import SkillGrid from "../components/SkillGrid.astro";
 import data from "../data/experience.json";
+import { makeAxis } from "../lib/timeline";
 
-/* Holding page while the site is rebuilt.
-
-   It is deliberately not an "under construction" notice. The premise of the
-   redesign is that the career data IS the imagery — no client screenshots
-   exist and none are coming — so the holding page renders the smallest honest
-   version of that: sixteen years on one axis. If this does not feel like a
-   product, the token set is wrong and it is cheap to find out here. */
+/* The home is the site's public record: trajectory, skill set, and what is
+   current. It is long and dense on purpose — the previous version's problem
+   was five thin pages that each said very little.
+   
+   There is no projects section yet. The only entry in the collection was a
+   placeholder, and a fake card was the single worst thing about the old site;
+   it returns in phase 6 with real work. */
 
 const { profile, roles, tech } = data;
 
-const AXIS_START = profile.careerStart;
-const AXIS_END = new Date().getFullYear();
+const NOW = new Date().getFullYear();
+const axis = makeAxis(profile.careerStart, NOW);
+const years = NOW - profile.careerStart;
 
-/* Months since the axis origin, so a role that starts mid-year lands in the
-   right place rather than snapping to January. An open-ended role runs to the
-   end of the axis. */
-const months = (iso: string | null) => {
-  if (!iso) return (AXIS_END + 1 - AXIS_START) * 12;
-  const [y, m] = iso.split("-").map(Number);
-  return (y - AXIS_START) * 12 + ((m ?? 1) - 1);
-};
-
-const SPAN = (AXIS_END + 1 - AXIS_START) * 12;
-const pct = (m: number) => `${((m / SPAN) * 100).toFixed(2)}%`;
-
-const year = (iso: string | null) => (iso ? iso.slice(0, 4) : "now");
-
-/* Colour encodes time. Each bar is a slice of a single ramp that runs across
-   the whole axis — indigo at 2010, brand teal at the present — so the fills
-   mean something instead of each bar repeating the same gradient. Expressed as
-   "how far toward accent-2", which is what color-mix() wants. */
-const ramp = (m: number) => `${(100 - (m / SPAN) * 100).toFixed(1)}%`;
-
-// Oldest first, so the figure reads left to right like the axis.
-const bars = [...roles].reverse().map((r, i) => ({
-  org: r.org,
-  from: year(r.start),
-  to: year(r.end),
-  current: r.end === null,
-  left: pct(months(r.start)),
-  width: pct(months(r.end) - months(r.start)),
-  cFrom: ramp(months(r.start)),
-  cTo: ramp(months(r.end)),
-  delay: `${260 + i * 110}ms`,
+/* Newest first for the cards: what someone is doing now matters most. */
+const roleCards = roles.map((r) => ({
+  ...r,
+  from: new Date(`${r.start}-01T00:00:00Z`).toLocaleDateString("en", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }),
+  to: r.end
+    ? new Date(`${r.end}-01T00:00:00Z`).toLocaleDateString("en", {
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+    : "Present",
+  highlights: r.highlights.slice(0, 3),
+  trimmed: r.highlights.length - 3,
 }));
 
-const years = AXIS_END - AXIS_START;
+/* The one role with no end date. There is always exactly one. */
+const current = roleCards.find((r) => r.end === null)!;
 
 const stats = [
-  { figure: `${years}`, label: "years" },
+  { figure: `${years}`, label: "years in" },
   { figure: `${roles.length}`, label: "companies" },
   { figure: `${tech.length}`, label: "technologies" },
 ];
 
-const links = [
-  { href: "/resume", label: "Resume" },
-  { href: "mailto:crisarji@gmail.com", label: "Email" },
-  { href: "https://github.com/crisarji", label: "GitHub", ext: true },
+const elsewhere = [
+  { href: "mailto:crisarji@gmail.com", label: "crisarji@gmail.com", note: "Email" },
+  { href: "https://github.com/crisarji", label: "github.com/crisarji", note: "Code", ext: true },
   {
     href: "https://www.linkedin.com/in/cristian-arce-a0757158/",
     label: "LinkedIn",
+    note: "Network",
     ext: true,
   },
 ];
@@ -71,356 +61,491 @@ const links = [
 
 <BaseLayout
   title="crisarji"
-  description={`Cristian Arce — software engineer, ${years} years in. Front-end architecture, design systems and micro frontends. Site being rebuilt; the resume is up.`}
+  description={`Cristian Arce — software engineer, ${years} years in. ERP back ends, then front-end architecture, design systems and micro frontends for US-based clients.`}
   ogImage="/og/site.png"
-  chrome={false}
 >
   <div class="glow" aria-hidden="true"></div>
 
-  <div class="shell">
-    <section class="card">
-      <div class="corner">
-        <ThemeToggle />
-      </div>
-
-      <p class="eyebrow enter-fade">crisarji.dev</p>
-
-      <h1 class="enter" style="--delay:60ms">{profile.name}</h1>
+  <!-- ---------------------------------------------------------------- hero -->
+  <section class="hero wrap">
+    <div class="intro">
+      <p class="eyebrow enter-fade">Software engineer · Costa Rica</p>
+      <h1 class="enter" style="--delay:60ms">Cristian Arce</h1>
 
       <p class="lede enter" style="--delay:120ms">
-        Software engineer, {years} years in. Front-end architecture, design
-        systems and micro frontends for US-based clients — from Costa Rica.
+        {years} years in. I started on the back end of ERP systems, moved to the
+        front end, and now lead web practice work for US-based clients — design
+        systems, micro frontends, and the people building them.
       </p>
 
-      <figure class="arc enter" style="--delay:200ms">
-        <figcaption class="eyebrow">The shape of it</figcaption>
+      <p class="cta enter" style="--delay:200ms">
+        <a class="btn" href="#trajectory">See the trajectory</a>
+        <a class="btn ghost" href="/resume">Resume</a>
+      </p>
+    </div>
 
-        <ol class="rows">
-          {
-            bars.map((b) => (
-              <li class:list={["row", b.current && "is-current"]}>
-                <span class="org">{b.org}</span>
-                <span class="track">
-                  <span
-                    class="bar draw"
-                    style={`left:${b.left};width:${b.width};--c-from:${b.cFrom};--c-to:${b.cTo};--delay:${b.delay}`}
-                  />
-                </span>
-                <span class="span">
-                  {b.from}<span class="dash">–</span>{b.to}
-                </span>
-              </li>
-            ))
-          }
-        </ol>
+    <aside class="glance enter" style="--delay:260ms">
+      <p class="eyebrow">At a glance</p>
+      <p class="gorg">{current.org}</p>
+      <p class="grole">{current.title}</p>
+      <p class="gmeta">{current.from} – Present · {current.context}</p>
 
-        <div class="axis" aria-hidden="true">
-          <span>{AXIS_START}</span>
-          <span>{AXIS_END}</span>
-        </div>
-      </figure>
-
-      <ul class="stats enter" style="--delay:300ms">
+      <ul class="stats">
         {
           stats.map((s) => (
             <li>
+              <span class="slabel">{s.label}</span>
               <span class="figure">{s.figure}</span>
-              <span class="label">{s.label}</span>
             </li>
           ))
         }
       </ul>
+    </aside>
+  </section>
 
-      <p class="note enter" style="--delay:380ms">
-        This site is being rebuilt — the full record of trajectory, skill set
-        and projects is on its way. The resume is already up, and email is the
-        reliable way to reach me.
+  <!-- -------------------------------------------------------- trajectory -->
+  <section class="sect wrap" id="trajectory">
+    <header class="shead reveal">
+      <p class="eyebrow">Trajectory</p>
+      <h2>Sixteen years on one axis</h2>
+      <p class="prose">
+        Three companies, one continuous arc: ERP modules for Central America,
+        then full-stack for US clients, then front-end architecture. Colour
+        runs with time — the further right, the closer to now.
       </p>
+    </header>
 
-      <ul class="links enter" style="--delay:440ms">
-        {
-          links.map((l) => (
-            <li>
-              <a
-                href={l.href}
-                target={l.ext ? "_blank" : undefined}
-                rel={l.ext ? "noopener" : undefined}
-              >
+    <CareerArc roles={roles} tech={tech} axis={axis} />
+
+    <ol class="cards">
+      {
+        roleCards.map((r) => (
+          <li class:list={["card", "reveal", !r.end && "is-current"]}>
+            <p class="when">
+              {r.from}<span class="dash">–</span>{r.to}
+            </p>
+            <h3>
+              {r.org}
+              {r.orgNote && <span class="note"> ({r.orgNote})</span>}
+            </h3>
+            <p class="role">{r.title}</p>
+            {r.context && <p class="ctx">{r.context}</p>}
+            <ul>
+              {r.highlights.map((h) => <li>{h}</li>)}
+            </ul>
+            {r.trimmed > 0 && (
+              <p class="more">
+                <a href="/resume">+{r.trimmed} more on the resume</a>
+              </p>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <!-- ------------------------------------------------------------ skills -->
+  <section class="sect wrap" id="skills">
+    <header class="shead reveal">
+      <p class="eyebrow">Skill set</p>
+      <h2>What I have actually shipped with</h2>
+      <p class="prose">
+        Grouped by what it does, ordered by how long it has been in play. The
+        open-ended ones are current.
+      </p>
+    </header>
+
+    <SkillGrid tech={tech} now={NOW} />
+  </section>
+
+  <!-- --------------------------------------------------------------- now -->
+  <section class="sect wrap" id="now">
+    <div class="now-card reveal">
+      <p class="eyebrow">Currently</p>
+      {
+        profile.learning.items.map((l) => (
+          <>
+            <h2>
+              {l.name} <span class="since">since {profile.learning.since}</span>
+            </h2>
+            <p class="prose">{l.detail}</p>
+          </>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- about -->
+  <section class="sect wrap" id="about">
+    <header class="shead reveal">
+      <p class="eyebrow">How I work</p>
+      <h2>The reasoning outlives the stack</h2>
+    </header>
+
+    <div class="two reveal">
+      <div class="prose">
+        <p>
+          My first years were spent inside Exactus ERP — point-of-sales,
+          electronic invoicing, CRM — for clients across Central America and the
+          Caribbean. That work was unglamorous and it taught me the thing I
+          still lean on: software that handles somebody's money is judged on
+          correctness long before it is judged on anything else.
+        </p>
+        <p>
+          I moved to the front end because the pace of the web stack held my
+          attention, and I stayed because the interesting problems moved there
+          too. Design systems, micro frontends, and the seams between them are
+          where a decision made once gets paid for, or paid off, by every team
+          downstream.
+        </p>
+      </div>
+      <div class="prose">
+        <p>
+          I care about the reasoning behind a stack more than the stack itself.
+          Most technical choices are defensible; what separates them is whether
+          anyone can reconstruct why the choice was made two years later.
+        </p>
+        <p>
+          The other half of the job is people. A good part of my time goes to
+          mentorship, career-path conversations and evaluating candidates, and
+          it is the part I would least want to give up. It comes from my own
+          time as a student.
+        </p>
+        <p class="credo">{profile.credo}</p>
+      </div>
+    </div>
+
+    <ul class="edu reveal">
+      {
+        profile.education.map((e) => (
+          <li>
+            <span class="eyear">{e.year}</span>
+            <span>{e.title}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- ----------------------------------------------------------- contact -->
+  <section class="sect wrap" id="contact">
+    <header class="shead reveal">
+      <p class="eyebrow">Contact</p>
+      <h2>Email is the reliable one</h2>
+    </header>
+
+    <ul class="links reveal">
+      {
+        elsewhere.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              target={l.ext ? "_blank" : undefined}
+              rel={l.ext ? "noopener" : undefined}
+            >
+              <span class="lnote">{l.note}</span>
+              <span class="llabel">
                 {l.label}
-                {l.ext && <span aria-hidden="true">↗</span>}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </section>
-  </div>
+                {l.ext && <span aria-hidden="true"> ↗</span>}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 </BaseLayout>
 
 <style>
   /* --- ambient ------------------------------------------------------------ */
 
   .glow {
-    --wash-a: 26%;
-    --wash-b: 22%;
-    --wash-c: 16%;
-    position: fixed;
-    inset: 0;
+    --wash-a: 24%;
+    --wash-b: 20%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80vh;
     z-index: -1;
     pointer-events: none;
     background:
       radial-gradient(
-        42rem 32rem at 12% -8%,
+        42rem 30rem at 8% -10%,
         color-mix(in srgb, var(--accent) var(--wash-a), transparent),
         transparent 70%
       ),
       radial-gradient(
-        38rem 30rem at 92% 8%,
+        38rem 28rem at 95% -6%,
         color-mix(in srgb, var(--accent-2) var(--wash-b), transparent),
         transparent 70%
-      ),
-      radial-gradient(
-        50rem 34rem at 50% 108%,
-        color-mix(in srgb, var(--accent) var(--wash-c), transparent),
-        transparent 72%
       );
   }
-
-  /* Dark needs a lighter hand: the same wash over near-black turns milky. */
-  :global(html[data-theme="dark"]) .glow {
-    --wash-a: 16%;
-    --wash-b: 14%;
-    --wash-c: 10%;
-  }
+  :global(html[data-theme="dark"]) .glow { --wash-a: 15%; --wash-b: 13%; }
   @media (prefers-color-scheme: dark) {
-    :global(html:not([data-theme="light"])) .glow {
-      --wash-a: 16%;
-      --wash-b: 14%;
-      --wash-c: 10%;
-    }
+    :global(html:not([data-theme="light"])) .glow { --wash-a: 15%; --wash-b: 13%; }
   }
 
-  /* --- shell -------------------------------------------------------------- */
+  /* --- hero --------------------------------------------------------------- */
 
-  .shell {
-    position: relative;
-    flex: 1;
+  .hero {
+    padding-block: clamp(3rem, 8vw, 5.5rem) clamp(2rem, 5vw, 3rem);
     display: grid;
-    place-items: center;
-    padding: clamp(1.25rem, 3vw, 2rem) var(--gap);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
   }
-
-  .corner {
-    position: absolute;
-    top: clamp(1rem, 3vw, 1.5rem);
-    right: clamp(1rem, 3vw, 1.5rem);
-  }
-
-  .card {
-    position: relative;
-    width: 100%;
-    max-width: 44rem;
-    padding: clamp(1.5rem, 4vw, 2.75rem);
-    background: var(--veil);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--e-3);
-    backdrop-filter: blur(20px) saturate(150%);
-  }
-
-  .eyebrow { padding-right: 3rem; }
 
   h1 {
-    margin-top: 0.5rem;
+    margin-top: 0.6rem;
     font-size: var(--t-3xl);
     font-weight: 700;
   }
 
   .lede {
-    margin-top: 0.85rem;
-    max-width: 32rem;
+    margin-top: 1rem;
     font-size: var(--t-lg);
     color: var(--body);
   }
 
-  /* --- the figure --------------------------------------------------------- */
-
-  .arc {
-    margin-top: clamp(1.5rem, 4vw, 2rem);
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--rule-soft);
+  /* The right half used to be empty. It now carries the current role and the
+     three figures, which is the first thing anyone wants. */
+  .glance {
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    background: var(--veil);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--e-3);
+    backdrop-filter: blur(16px) saturate(150%);
   }
 
-  .rows {
-    list-style: none;
-    padding: 0;
-    margin-top: 1.1rem;
-    display: grid;
-    gap: 0.55rem;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 7.5rem 1fr 5.25rem;
-    align-items: center;
-    gap: 0.9rem;
-  }
-
-  .org {
-    font-size: var(--t-sm);
-    font-weight: 500;
+  .gorg {
+    margin-top: 0.6rem;
+    font-family: var(--f-display);
+    font-size: var(--t-xl);
+    font-weight: 600;
+    letter-spacing: -0.03em;
     color: var(--ink);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.15;
   }
-
-  .track {
-    position: relative;
-    height: 0.6rem;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--ink) 7%, transparent);
-  }
-
-  .bar {
-    position: absolute;
-    inset-block: 0;
-    border-radius: 999px;
-    background: linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--accent-2) var(--c-from), var(--accent)) 0%,
-      color-mix(in oklab, var(--accent-2) var(--c-to), var(--accent)) 100%
-    );
-    transform-origin: left center;
-  }
-
-  /* The open-ended role is the one that matters most, so it gets the only
-     emphasis in the figure. */
-  .is-current .bar {
-    box-shadow:
-      0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent),
-      0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
-  }
-  .is-current .org { font-weight: 600; }
-
-  .span {
+  .grole { margin-top: 0.25rem; font-size: var(--t-sm); font-weight: 500; color: var(--body); }
+  .gmeta {
+    margin-top: 0.35rem;
     font-family: var(--f-mono);
     font-size: var(--t-xs);
     color: var(--muted);
-    text-align: right;
-    white-space: nowrap;
   }
-  .dash { color: var(--faint); padding-inline: 0.1em; }
-
-  .axis {
-    margin-top: 0.9rem;
-    padding-top: 0.6rem;
-    border-top: 1px dashed var(--rule-soft);
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--f-mono);
-    font-size: var(--t-xs);
-    color: var(--faint);
-  }
-
-  /* --- stats -------------------------------------------------------------- */
 
   .stats {
     list-style: none;
     padding: 0;
-    margin-top: clamp(1.25rem, 3vw, 1.75rem);
+    margin-top: 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--rule-soft);
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
+    gap: 0.55rem;
   }
-
   .stats li {
-    padding: 0.85rem 1rem;
-    background: var(--grad-soft);
-    border: 1px solid var(--rule-soft);
-    border-radius: var(--radius);
-    display: grid;
-    gap: 0.1rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
   }
-
+  .slabel { font-size: var(--t-sm); color: var(--muted); }
   .figure {
     font-family: var(--f-mono);
-    font-size: var(--t-xl);
+    font-size: var(--t-lg);
     font-weight: 500;
     color: var(--ink);
-    line-height: 1;
     letter-spacing: -0.03em;
   }
 
-  .label {
-    font-size: var(--t-xs);
-    color: var(--muted);
-  }
-
-  /* --- tail --------------------------------------------------------------- */
-
-  .note {
-    margin-top: clamp(1.25rem, 3vw, 1.75rem);
-    max-width: 34rem;
-    font-size: var(--t-sm);
-    color: var(--muted);
-  }
-
-  .links {
-    list-style: none;
-    padding: 0;
-    margin-top: 1.1rem;
+  .cta {
+    margin-top: 1.75rem;
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
   }
-
-  .links a {
+  .btn {
     display: inline-flex;
-    align-items: baseline;
-    gap: 0.3rem;
-    padding: 0.45rem 0.9rem;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
     font-size: var(--t-sm);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: 1px solid transparent;
+    box-shadow: var(--e-1);
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      box-shadow var(--dur-2) var(--ease-out),
+      opacity var(--dur-1) var(--ease-out);
+  }
+  .btn:hover { transform: var(--lift); box-shadow: var(--e-2); opacity: 0.92; }
+  .btn.ghost {
+    background: var(--surface);
     color: var(--ink);
+    border-color: var(--rule);
+  }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); opacity: 1; }
+
+  @media (max-width: 56rem) {
+    .hero { grid-template-columns: 1fr; gap: 2rem; }
+  }
+
+  /* --- sections ----------------------------------------------------------- */
+
+  .sect {
+    padding-block: clamp(2.5rem, 7vw, 4.5rem);
+    border-top: 1px solid var(--rule-soft);
+  }
+  .sect:first-of-type { border-top: 0; }
+
+  .shead h2 { margin-top: 0.5rem; }
+  .shead .prose { margin-top: 0.85rem; max-width: 42rem; color: var(--muted); }
+
+  /* --- role cards ---------------------------------------------------------- */
+
+  .cards {
+    list-style: none;
+    padding: 0;
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+    gap: 0.75rem;
+  }
+
+  .card {
+    padding: 1.4rem 1.5rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--e-1);
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      box-shadow var(--dur-2) var(--ease-out);
+  }
+  .card:hover { transform: var(--lift); box-shadow: var(--e-2); }
+  .card.is-current { border-color: color-mix(in srgb, var(--accent) 40%, var(--rule)); }
+
+  .when {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    color: var(--accent);
+  }
+  .dash { color: var(--faint); padding-inline: 0.15em; }
+
+  .card h3 { margin-top: 0.4rem; font-size: var(--t-lg); }
+  .card h3 .note { font-weight: 400; color: var(--muted); font-size: var(--t-sm); }
+  .role { margin-top: 0.15rem; font-size: var(--t-sm); color: var(--body); font-weight: 500; }
+  .ctx { margin-top: 0.1rem; font-size: var(--t-xs); color: var(--muted); }
+
+  .card ul {
+    margin-top: 0.9rem;
+    padding-left: 1rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .card li { font-size: var(--t-sm); color: var(--body); }
+  .card li::marker { color: var(--faint); }
+
+  .more { margin-top: 0.8rem; font-size: var(--t-xs); }
+
+  /* --- now ----------------------------------------------------------------- */
+
+  .now-card {
+    padding: clamp(1.5rem, 4vw, 2.25rem);
+    background: var(--grad-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--rule));
+    border-radius: var(--radius-lg);
+  }
+  .now-card h2 { margin-top: 0.5rem; }
+  .since {
+    font-family: var(--f-mono);
+    font-size: var(--t-sm);
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: 0;
+  }
+  .now-card .prose { margin-top: 0.9rem; max-width: 44rem; }
+
+  /* --- about --------------------------------------------------------------- */
+
+  .two {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  .two .prose > * + * { margin-top: 1rem; }
+  .credo {
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--accent);
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .edu {
+    list-style: none;
+    padding: 0;
+    margin-top: 2.5rem;
+    display: grid;
+    gap: 0.5rem;
+    max-width: 28rem;
+  }
+  .edu li {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    font-size: var(--t-sm);
+    color: var(--body);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .eyear {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    color: var(--muted);
+    flex: none;
+  }
+
+  /* --- contact -------------------------------------------------------------- */
+
+  .links {
+    list-style: none;
+    padding: 0;
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0.75rem;
+  }
+  .links a {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1.1rem 1.25rem;
     text-decoration: none;
     background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: 999px;
+    border-radius: var(--radius);
     box-shadow: var(--e-1);
     transition:
       transform var(--dur-2) var(--ease-out),
       border-color var(--dur-1) var(--ease-out),
-      box-shadow var(--dur-2) var(--ease-out),
-      color var(--dur-1) var(--ease-out);
+      box-shadow var(--dur-2) var(--ease-out);
   }
   .links a:hover {
     transform: var(--lift);
-    color: var(--accent);
-    border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--rule));
     box-shadow: var(--e-2);
   }
-  .links a span { font-size: 0.8em; color: var(--faint); }
-  .links a:hover span { color: var(--accent); }
-
-  /* --- narrow ------------------------------------------------------------- */
-
-  @media (max-width: 34rem) {
-    /* The bar keeps its proportional width, so duration still reads; only the
-       label and the span move off the row. */
-    .row {
-      grid-template-columns: 1fr auto;
-      gap: 0.3rem 0.75rem;
-    }
-    .org { grid-row: 1; }
-    .span { grid-row: 1; }
-    .track { grid-row: 2; grid-column: 1 / -1; }
-    .rows { gap: 1rem; }
-
-    .stats { grid-template-columns: 1fr; }
-    .stats li {
-      grid-template-columns: 3.5rem 1fr;
-      align-items: baseline;
-      gap: 0.5rem;
-    }
+  .lnote {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
+  .llabel { font-size: var(--t-sm); color: var(--ink); }
 </style>
