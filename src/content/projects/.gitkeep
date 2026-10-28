@@ -1,0 +1,8 @@
+The projects collection is defined in src/content.config.ts and is empty on
+purpose: the placeholder entry was deleted in phase 3 and real work lands in
+phase 6. Git does not track empty directories, so this file keeps the loader's
+base directory present.
+
+The build still warns that nothing matches "**/*.md". That warning is correct
+— the collection is empty — and it goes away when the first real project is
+added. The loader only reads .md, so this file is never content.
